@@ -1,6 +1,6 @@
 {
     "archive": {
-        "targetFile": "build/FS25_dlcBoatExtension.zip",
+        "targetFile": "build/FS25_0_dlcBoatExtension.zip",
         "extensions": [
             "i3d",
             "shapes",

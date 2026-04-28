@@ -46,7 +46,7 @@ NOTE: Important that the specialization is added after Boat specialization.
     <type ...>
         ...
         <specialization name="pdlc_highlandsFishingPack.boat" />
-        <specialization name="FS25_dlcBoatExtension.attachableBoatExtension" />
+        <specialization name="FS25_0_dlcBoatExtension.attachableBoatExtension" />
     </type>
 </vehicleTypes>
 ```
