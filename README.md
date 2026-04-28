@@ -33,6 +33,10 @@ Allows following placeables to be used on other maps
 
 - Offshore Aquaculture fish farm production
 
+## How to download and install
+
+Download the latest [```FS25_0_dlcBoatExtension.zip```](https://github.com/scfmod/FS25_dlcBoatExtension/releases/latest/download/FS25_0_dlcBoatExtension.zip) and copy/move it into your FS25 mods folder.
+
 ## Specializations
 
 ### AttachableBoatExtension
