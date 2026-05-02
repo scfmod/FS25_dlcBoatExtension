@@ -3,10 +3,6 @@
     <author>scfmod</author>
     <version>1.0.0.0</version>
 
-    <dependencies>
-        <dependency>pdlc_highlandsFishingPack</dependency>
-    </dependencies>
-
     <title>
         <en>DLC Boat Extension mod</en>
     </title>
