@@ -16,6 +16,8 @@
 ---@field onPreLoad fun(self: Boat)
 ---@field onLoadFinished fun(self: Boat)
 ---@field onUpdate fun(self: Boat)
+---@field getMotorRpmReal fun(self: Boat): number
+---@field getMotorRpmPercentage fun(self: Boat): number
 
 ---@class Enterable_spec
 ---@field isEntered boolean

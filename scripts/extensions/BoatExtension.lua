@@ -106,3 +106,9 @@ Boat.onPreLoad = Utils.overwrittenFunction(Boat.onPreLoad, inj_Boat_onPreLoad)
 Boat.onLoadFinished = Utils.overwrittenFunction(Boat.onLoadFinished, inj_Boat_onLoadFinished)
 Boat.setBoatWaterPlaneId = Utils.overwrittenFunction(Boat.setBoatWaterPlaneId, inj_Boat_setBoatWaterPlaneId)
 -- Boat.getCanBeAddedToSales = Utils.overwrittenFunction(Boat.getCanBeAddedToSales, inj_Boat_getCanBeAddedToSales)
+
+-- [min .. max] RPM from XML
+g_soundManager:registerModifierType("BOAT_MOTOR_RPM", Boat.getMotorRpmReal)
+
+-- [0 .. 1] acceleration (absolute, in either direction)
+g_soundManager:registerModifierType("BOAT_ACCELERATION", Boat.getMotorRpmPercentage)
