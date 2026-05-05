@@ -1,5 +1,11 @@
 ---@meta
 
+---@class VehicleComponent
+---@field node number
+---@field mass number
+---@field defaultMass number
+---@field solverIterationCount? number
+
 ---@class Boat : Vehicle
 ---@field SPEC_TABLE_NAME string
 ---@field spec_shallowWaterObstacles ShallowWaterObstacles_spec

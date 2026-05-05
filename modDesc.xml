@@ -16,10 +16,6 @@
 
     <multiplayer supported="true" />
 
-    <specializations>
-        <specialization name="attachableBoatExtension" className="AttachableBoatExtension" filename="scripts/specializations/AttachableBoatExtension.lua" />
-    </specializations>
-
     <extraSourceFiles>
         <sourceFile filename="scripts/main.lua" />
     </extraSourceFiles>

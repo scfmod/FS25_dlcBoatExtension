@@ -1,12 +1,3 @@
-local dlcEnv = _G['pdlc_highlandsFishingPack']
-
-if dlcEnv == nil then
-    Logging.info('DLC "pdlc_highlandsFishingPack" is not loaded, omitting AttachableBoatExtension specialization')
-    return
-end
-
-local Boat = dlcEnv.Boat
-
 ---@class AttachableBoatExtension_spec
 ---@field disableJointAttach boolean
 

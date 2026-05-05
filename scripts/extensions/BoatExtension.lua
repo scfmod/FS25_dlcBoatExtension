@@ -16,10 +16,6 @@
       Make sure that Boats work on other maps, prevent specialization setting custom position compression parameters.
 ]]
 
-local dlcEnv = _G['pdlc_highlandsFishingPack']
----@type Boat
-local Boat = dlcEnv.Boat
-
 ---@param self Boat
 local function inj_Boat_onBoatWaterPlaneRaycastCallback(self, superFunc, nodeId, x, y, z, distance, nx, ny, nz, subShapeIndex, shapeId, isLast)
     ---@type Boat_spec
