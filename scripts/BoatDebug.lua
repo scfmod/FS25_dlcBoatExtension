@@ -53,10 +53,6 @@ function BoatDebug:draw()
         return
     end
 
-    local dlcEnv = _G['pdlc_highlandsFishingPack']
-    ---@type Boat
-    local Boat = dlcEnv.Boat
-
     ---@type Boat?
     local vehicle = g_localPlayer:getCurrentVehicle()
 
@@ -94,18 +90,14 @@ end
 ---@param vehicle Boat
 ---@param spec Boat_spec
 function BoatDebug:drawForceNode(node, vehicle, spec)
-    local radius = 0.5
-    local r, g, b = 0.2, 0.3, 1
+    local radius = 0.25
+    local r, g, b = 0.8, 0.9, 1
     local wx, wy, wz = getWorldTranslation(node)
 
     local steeringInput = spec.steeringInput
     local motorAcceleration = spec.motorAcceleration
 
     DebugUtil.drawDebugCircle(wx, wy, wz, 0.015, 8, { r, g, b }, nil, nil, false)
-
-    r = r * motorAcceleration
-    g = g * motorAcceleration
-    b = b * motorAcceleration
 
     motorAcceleration = motorAcceleration * radius
 
@@ -128,9 +120,9 @@ end
 ---@param vehicle Boat
 ---@param spec Boat_spec
 function BoatDebug:drawPhysicsInfo(vehicle, spec)
+    ---@type VehicleComponent
     local component = vehicle.components[1]
     local node = component.node
-    local mass = getMass(node)
     local x, y, z = getWorldTranslation(node)
     local cx, cy, cz = getCenterOfMass(node)
     local wx, wy, wz = localToWorld(node, cx, cy, cz)
@@ -141,27 +133,41 @@ function BoatDebug:drawPhysicsInfo(vehicle, spec)
     DebugUtil.drawDebugCircle(wx, wy, wz, 0.1, 8, { 0.7, 0.1, 0.1 }, nil, nil, false)
     DebugUtil.drawDebugCircle(jx, jy, jz, 0.2, 8, { 0.1, 0.7, 0.1 }, nil, nil, false)
 
-    self:drawText('mass: %2.f kg', mass * 1000)
-    setTextColor(0.9, 0.2, 0.2, 1)
-    self:drawText('center of mass: %.2f, %.2f, %.2f', cx, cy, cz)
-    setTextColor(0.2, 0.9, 0.2, 1)
-    self:drawText('jointPosition: %.2f, %.2f, %.2f', jointOffset[1], jointOffset[2], jointOffset[3])
-    setTextColor(1, 1, 1, 1)
-    self:drawText('waterDepth: %.4f', spec.joint.waterDepth)
+    local defaultMass = ModUtils.formatMass(component.defaultMass)
+    local additionalMass = ModUtils.formatMass(vehicle:getAdditionalComponentMass(component))
+    local totalMass = ModUtils.formatMass(component.mass)
 
+    setTextBold(true)
+    self:drawText('Main component')
+    setTextBold(false)
+    self.textX = self.textX + 0.005
+    self:drawText('Default mass: %s', defaultMass)
+    self:drawText('Additional mass: %s', additionalMass)
+    self:drawText('Total mass: %s', totalMass)
+    setTextColor(0.9, 0.2, 0.2, 1)
+    self:drawText('Center of mass: %.2f, %.2f, %.2f', cx, cy, cz)
+    setTextColor(0.2, 0.9, 0.2, 1)
+    self:drawText('Joint position: %.2f, %.2f, %.2f', jointOffset[1], jointOffset[2], jointOffset[3])
+
+    setTextColor(1, 1, 1, 1)
     if component.solverIterationCount ~= nil then
         self:drawText('solverIterationCount: %d', component.solverIterationCount)
     end
 
-    local rigidBodyType = getRigidBodyType(node)
+    self.textX = self.textX - 0.005
 
-    if rigidBodyType == RigidBodyType.STATIC then
-        self:drawText('rigidBodyType: STATIC')
-    elseif rigidBodyType == RigidBodyType.KINEMATIC then
-        self:drawText('rigidBodyType: KINEMATIC')
-    elseif rigidBodyType == RigidBodyType.DYNAMIC then
-        self:drawText('rigidBodyType: DYNAMIC')
-    end
+    self:drawText('')
+    self:drawText('waterDepth: %.4f', spec.joint.waterDepth)
+
+    -- local rigidBodyType = getRigidBodyType(node)
+
+    -- if rigidBodyType == RigidBodyType.STATIC then
+    --     self:drawText('rigidBodyType: STATIC')
+    -- elseif rigidBodyType == RigidBodyType.KINEMATIC then
+    --     self:drawText('rigidBodyType: KINEMATIC')
+    -- elseif rigidBodyType == RigidBodyType.DYNAMIC then
+    --     self:drawText('rigidBodyType: DYNAMIC')
+    -- end
 
     self:drawText('jointIndex: %s', tostring(spec.jointIndex))
 end
