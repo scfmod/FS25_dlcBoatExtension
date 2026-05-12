@@ -13,6 +13,8 @@ if g_modIsLoaded[dlcName] then
     source(g_currentModDirectory .. 'scripts/ModController.lua')
 
     source(g_currentModDirectory .. 'scripts/extensions/BoatExtension.lua')
+    source(g_currentModDirectory .. 'scripts/extensions/InteractiveControlExtension.lua')
+    source(g_currentModDirectory .. 'scripts/extensions/ShallowWaterObstaclesExtension.lua')
     source(g_currentModDirectory .. 'scripts/extensions/ShallowWaterSimulationExtension.lua')
     source(g_currentModDirectory .. 'scripts/extensions/XMLFileExtension.lua')
 

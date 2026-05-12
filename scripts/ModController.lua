@@ -32,6 +32,12 @@ function ModController.new()
     return self
 end
 
+---@param str string
+---@param ... any
+function ModController:debug(str, ...)
+    print('DEBUG:  ' .. string.format(str, ...))
+end
+
 function ModController:consoleCopyDlcBoatXMLFiles(outputPath)
     if outputPath == nil then
         return '_copyDlcBoatXMLFiles <outputPath>'
@@ -136,5 +142,12 @@ function ModController:loadMap()
     self:updateDlcStoreItems()
 end
 
+function ModController.loadMods()
+    g_interactiveControlExtension:onModsLoaded()
+end
+
 ---@diagnostic disable-next-line: lowercase-global
 g_modController = ModController.new()
+
+---@diagnostic disable-next-line: undefined-global
+g_onCreateUtil.activateOnCreateFunctions = Utils.appendedFunction(g_onCreateUtil.activateOnCreateFunctions, ModController.loadMods)
