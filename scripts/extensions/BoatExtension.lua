@@ -52,9 +52,8 @@ end
 ---@param self Boat
 ---@param superFunc function
 local function inj_Boat_onPreLoad(self, superFunc)
-    if g_mpLoadingScreen.missionInfo.mapId == 'pdlc_highlandsFishingPack.HighlandsFishingMap' then
-        superFunc(self)
-    end
+    -- void, skip calling superFunc to avoid setting custom vehicle
+    -- position compression parameters regardless of map.
 end
 
 ---@param self any
