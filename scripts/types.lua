@@ -31,6 +31,9 @@
 ---@class Boat_spec
 ---@field waterEffectsMinSpeed? number
 ---@field pendingWaterRaycast boolean
+---@field waterPlaneHeight number
+---@field lastWaterPlaneHeight? number
+---@field keepAwake boolean
 ---@field waterPlaneId? number
 ---@field waterSamples? table
 ---@field waterSamplesArePlaying boolean
