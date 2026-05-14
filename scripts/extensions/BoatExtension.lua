@@ -2,8 +2,8 @@
     - inj_Boat_onBoatWaterPlaneRaycastCallback
 
       Override raycast callback in order to allow lifting boats out of the water if distance to waterplane is too great.
-      It raycasts downwards at vehicle root node position with y offset + 25.0 looking for closest waterplane.
-      Raycast distance is 50.0.
+      It raycasts downwards at vehicle root node position with y offset + 25.0 looking for closest waterplane
+      Raycast distance is 50.0
 
       Also handles animated water planes (e.g. lock/dam systems): when the water plane node moves but
       keeps the same node ID, the original code skips joint recreation. We detect the height change and
@@ -13,7 +13,7 @@
 
     - inj_Boat_onUpdate
 
-      Override waterEffectsMinSpeed in order to prevent water effects (if applicable) when the boat is out of the water.
+      Override waterEffectsMinSpeed in order to prevent water effects (if applicable) when the boat is out of the water
 
 
     - inj_Boat_onPreLoad
@@ -21,7 +21,7 @@
       Make sure that Boats work on other maps, prevent specialization setting custom position compression parameters.
 
 
-    - inj_Mission00_update
+      - post_Mission00_update
 
       Handles the case where a stationary, unoccupied boat needs to follow an animated water plane.
       When a boat is sleeping (stationary and unoccupied) its physics body is inactive, so onUpdateTick
@@ -74,7 +74,7 @@ local function inj_Boat_onBoatWaterPlaneRaycastCallback(self, superFunc, nodeId,
 end
 
 ---@param self Boat
-local function inj_Boat_onUpdate(self, superFunc, dt, ...)
+local function inj_Boat_onUpdate(self, superFunc, ...)
     ---@type Boat_spec
     local spec = self[Boat.SPEC_TABLE_NAME]
     local previousWaterEffectsMinSpeed = spec.waterEffectsMinSpeed
@@ -83,7 +83,7 @@ local function inj_Boat_onUpdate(self, superFunc, dt, ...)
         spec.waterEffectsMinSpeed = 1000
     end
 
-    superFunc(self, dt, ...)
+    superFunc(self, ...)
 
     spec.waterEffectsMinSpeed = previousWaterEffectsMinSpeed
 end
@@ -91,9 +91,8 @@ end
 ---@param self Boat
 ---@param superFunc function
 local function inj_Boat_onPreLoad(self, superFunc)
-    if g_mpLoadingScreen.missionInfo.mapId == 'pdlc_highlandsFishingPack.HighlandsFishingMap' then
-        superFunc(self)
-    end
+    -- void, skip calling superFunc to avoid setting custom vehicle
+    -- position compression parameters regardless of map.
 end
 
 ---@param self any
@@ -111,10 +110,17 @@ local function inj_Boat_onLoadFinished(self, superFunc)
 end
 
 local function inj_Boat_setBoatWaterPlaneId(self, superFunc, node)
-    superFunc(self, node)
-
     ---@type Boat_spec
     local spec = self[Boat.SPEC_TABLE_NAME]
+
+    if node ~= nil and spec.waterPlaneId ~= node then
+        if spec.jointIndex ~= nil then
+            removeJoint(spec.jointIndex)
+            spec.jointIndex = nil
+        end
+    end
+
+    superFunc(self, node)
 
     if spec.waterPlaneId ~= nil then
         if spec.waterSamples ~= nil and not spec.waterSamplesArePlaying then
@@ -148,60 +154,56 @@ g_soundManager:registerModifierType("BOAT_MOTOR_RPM", Boat.getMotorRpmReal)
 -- [0 .. 1] acceleration (absolute, in either direction)
 g_soundManager:registerModifierType("BOAT_ACCELERATION", Boat.getMotorRpmPercentage)
 
--- Per-vehicle state for the animated water plane tracker below.
-local _boatLastWaterY = {}  -- water plane node Y from the previous frame
-local _boatKeepAwake = {}   -- true while sleep thresholds are overridden for this vehicle
-
 ---@param self Mission00
 ---@param dt number
-local function inj_Mission00_update(self, dt)
+local function post_Mission00_update(self, dt)
     if g_server == nil then
         return
     end
 
-    local vs = g_currentMission and g_currentMission.vehicleSystem
-    local vehicles = vs and vs.vehicles
-    if vehicles == nil then
-        return
-    end
+    for _, vehicle in ipairs(self.vehicleSystem.vehicles) do
+        ---@cast vehicle Boat
+        if vehicle.isDeleted or (vehicle.isDeleting or not vehicle.isAddedToPhysics) then
+            continue
+        end
 
-    for _, vehicle in ipairs(vehicles) do
+        ---@type Boat_spec
         local spec = vehicle[Boat.SPEC_TABLE_NAME]
 
-        if spec ~= nil and spec.waterPlaneId ~= nil then
-            local _, nodeY, _ = getWorldTranslation(spec.waterPlaneId)
-            local lastY = _boatLastWaterY[vehicle]
-            _boatLastWaterY[vehicle] = nodeY
+        if spec ~= nil then
+            if spec.waterPlaneId ~= nil then
+                local _, nodeY, _ = getWorldTranslation(spec.waterPlaneId)
+                local lastY = spec.lastWaterPlaneHeight
+                spec.lastWaterPlaneHeight = nodeY
 
-            if lastY ~= nil then
-                local waterDelta = nodeY - lastY
+                if lastY ~= nil then
+                    local waterDelta = nodeY - lastY
 
-                if math.abs(waterDelta) > 0.005 then
-                    -- Water is moving: disable physics sleeping so the body stays awake,
-                    -- then keep the vehicle in the update loop so raycasts keep firing.
-                    -- The existing joint spring moves the boat smoothly to the new height.
-                    if not _boatKeepAwake[vehicle] then
-                        setSleepingThresholds(vehicle.rootNode, 0, 0)
-                        _boatKeepAwake[vehicle] = true
+                    if math.abs(waterDelta) > 0.005 then
+                        -- Water is moving: disable physics sleeping so the body stays awake,
+                        -- then keep the vehicle in the update loop so raycasts keep firing.
+                        -- The existing joint spring moves the boat smoothly to the new height.
+                        if not spec.keepAwake then
+                            setSleepingThresholds(vehicle.rootNode, 0, 0)
+                            spec.keepAwake = true
+                        end
+                        vehicle:raiseActive()
+                    elseif spec.keepAwake then
+                        -- Water has settled: restore the thresholds set in Boat.addToPhysics.
+                        setSleepingThresholds(vehicle.rootNode, 0.3, 0.35)
+                        spec.keepAwake = false
                     end
-                    vehicle:raiseActive()
-
-                elseif _boatKeepAwake[vehicle] then
-                    -- Water has settled: restore the thresholds set in Boat.addToPhysics.
-                    setSleepingThresholds(vehicle.rootNode, 0.3, 0.35)
-                    _boatKeepAwake[vehicle] = false
                 end
-            end
+            else
+                spec.lastWaterPlaneHeight = nil
 
-        elseif spec ~= nil then
-            -- waterPlaneId is nil (boat left water or not yet initialised).
-            _boatLastWaterY[vehicle] = nil
-            if _boatKeepAwake[vehicle] then
-                setSleepingThresholds(vehicle.rootNode, 0.3, 0.35)
-                _boatKeepAwake[vehicle] = false
+                if spec.keepAwake then
+                    setSleepingThresholds(vehicle.rootNode, 0.3, 0.35)
+                    spec.keepAwake = false
+                end
             end
         end
     end
 end
 
-Mission00.update = Utils.appendedFunction(Mission00.update, inj_Mission00_update)
+Mission00.update = Utils.appendedFunction(Mission00.update, post_Mission00_update)
