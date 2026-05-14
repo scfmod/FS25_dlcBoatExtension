@@ -72,10 +72,17 @@ local function inj_Boat_onLoadFinished(self, superFunc)
 end
 
 local function inj_Boat_setBoatWaterPlaneId(self, superFunc, node)
-    superFunc(self, node)
-
     ---@type Boat_spec
     local spec = self[Boat.SPEC_TABLE_NAME]
+
+    if node ~= nil and spec.waterPlaneId ~= node then
+        if spec.jointIndex ~= nil then
+            removeJoint(spec.jointIndex)
+            spec.jointIndex = nil
+        end
+    end
+
+    superFunc(self, node)
 
     if spec.waterPlaneId ~= nil then
         if spec.waterSamples ~= nil and not spec.waterSamplesArePlaying then
