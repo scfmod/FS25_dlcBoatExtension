@@ -21,6 +21,7 @@
 ---@field getBoatPropellerEffectSpeed fun(self: Boat): number
 ---@field onPreLoad fun(self: Boat)
 ---@field onLoadFinished fun(self: Boat)
+---@field onDelete fun(self: Boat)
 ---@field onUpdate fun(self: Boat)
 ---@field getMotorRpmReal fun(self: Boat): number
 ---@field getMotorRpmPercentage fun(self: Boat): number
