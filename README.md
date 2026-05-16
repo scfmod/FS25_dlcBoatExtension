@@ -51,6 +51,41 @@ NOTE: Important that the specialization is added after Boat specialization.
         ...
         <specialization name="pdlc_highlandsFishingPack.boat" />
         <specialization name="FS25_0_dlcBoatExtension.attachableBoatExtension" />
+        ...
+    </type>
+</vehicleTypes>
+```
+
+### BoatFillUnitExtension
+
+Specialization to make sure that vehicles (Boat especially) with fillUnits set to updateMass="true" updates component mass correctly. When loading from savegame it will not always set mass correctly on component node, adding this specialization will make sure it updates correctly. No extra configuration needed.
+
+```xml
+<vehicleTypes>
+    <type ...>
+        ...
+        <specialization name="pdlc_highlandsFishingPack.boat" />
+        <specialization name="FS25_0_dlcBoatExtension.boatFillUnitExtension" />
+        ...
+    </type>
+</vehicleTypes>
+```
+
+### BoatControlExtension
+
+Enables toggling between multiple control modes for boats using custom input actions. E.g changing propeller force nodes, accelerationForce curve, steering parameters, acceleration parameters etc.
+
+See [FS25_customExtensionBoats](https://github.com/scfmod/FS25_customExtensionBoats) mod for examples.
+
+NOTE: Important that the specialization is added after Boat specialization.
+
+```xml
+<vehicleTypes>
+    <type ...>
+        ...
+        <specialization name="pdlc_highlandsFishingPack.boat" />
+        <specialization name="FS25_0_dlcBoatExtension.boatControlExtension" />
+        ...
     </type>
 </vehicleTypes>
 ```
